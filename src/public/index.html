@@ -1,0 +1,227 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Globalization AI Agent Assistant</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        ember: {
+                            50: '#fff8f2',
+                            100: '#ffead7',
+                            200: '#ffcfaa',
+                            300: '#ffb173',
+                            400: '#ff8d3d',
+                            500: '#ff6b1a',
+                            600: '#e5510a',
+                            700: '#be3e0c',
+                            800: '#973314',
+                            900: '#7a2d14'
+                        },
+                        slatewarm: {
+                            950: '#111111'
+                        }
+                    },
+                    boxShadow: {
+                        glow: '0 0 0 1px rgba(255,255,255,0.07), 0 20px 50px rgba(0,0,0,0.45)',
+                        ember: '0 10px 30px rgba(255,107,26,0.35)'
+                    },
+                    fontFamily: {
+                        display: ['"Space Grotesk"', 'ui-sans-serif', 'system-ui'],
+                        body: ['"Plus Jakarta Sans"', 'ui-sans-serif', 'system-ui'],
+                        mono: ['"IBM Plex Mono"', 'ui-monospace', 'SFMono-Regular', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+    <script src="/socket.io/socket.io.js"></script>
+    <style>
+        .mesh-bg {
+            background:
+                radial-gradient(circle at 15% 20%, rgba(255, 107, 26, 0.18) 0%, rgba(255, 107, 26, 0) 45%),
+                radial-gradient(circle at 80% 10%, rgba(255, 209, 148, 0.14) 0%, rgba(255, 209, 148, 0) 42%),
+                radial-gradient(circle at 65% 70%, rgba(255, 140, 71, 0.15) 0%, rgba(255, 140, 71, 0) 48%),
+                linear-gradient(120deg, #0f0f10, #141516 45%, #0c0c0d);
+        }
+
+        .glass {
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .progress-shimmer {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-shimmer::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            transform: translateX(-100%);
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+            animation: shimmer 2.1s infinite;
+        }
+
+        @keyframes shimmer {
+            100% {
+                transform: translateX(100%);
+            }
+        }
+    </style>
+</head>
+<body class="mesh-bg text-zinc-100 font-body min-h-screen p-4 md:p-8">
+    <div class="max-w-6xl mx-auto space-y-6">
+
+        <header class="glass border border-white/10 rounded-3xl p-6 md:p-8 shadow-glow">
+            <div class="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
+                <div>
+                    <p class="uppercase tracking-[0.2em] text-xs text-amber-200/70">Automation Console</p>
+                    <h1 class="font-display text-3xl md:text-5xl font-bold text-white leading-tight">Globalization Agent Assistant</h1>
+                    <p class="text-zinc-300 mt-3 max-w-2xl">Run multi-language audits, watch real-time execution, and inspect structured outputs from one focused workspace.</p>
+                </div>
+                <div class="inline-flex items-center gap-2 rounded-full border border-amber-300/30 bg-amber-500/10 px-3 py-1 text-xs text-amber-100">
+                    <span class="h-2 w-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Live Monitoring Enabled
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 xl:grid-cols-12 gap-6">
+            <section class="xl:col-span-4 glass border border-white/10 rounded-3xl p-6 shadow-glow space-y-5">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h2 class="font-display text-xl font-semibold text-amber-100">Test Configuration</h2>
+                    <span class="text-[11px] uppercase tracking-[0.2em] text-zinc-400">Input</span>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label for="targetUrl" class="block text-xs font-semibold text-zinc-300 uppercase tracking-[0.14em]">Target URL</label>
+                        <input id="targetUrl" type="text" title="Target application URL" placeholder="https://your-web-app.com" value="https://your-web-app.com" class="w-full mt-2 rounded-2xl border border-white/10 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-ember-400/60 focus:border-ember-300/60 transition">
+                    </div>
+                    <div>
+                        <label for="languages" class="block text-xs font-semibold text-zinc-300 uppercase tracking-[0.14em]">Languages (Comma Separated)</label>
+                        <input id="languages" type="text" title="Comma-separated language list" placeholder="English(US), Espanol(Spain), French(France)" value="English(US), Espanol(Spain), French(France)" class="w-full mt-2 rounded-2xl border border-white/10 bg-zinc-900/80 px-4 py-3 text-sm text-zinc-100 focus:outline-none focus:ring-2 focus:ring-ember-400/60 focus:border-ember-300/60 transition">
+                        <p class="mt-2 text-xs font-semibold text-amber-100 bg-amber-500/15 border border-amber-300/40 rounded-lg px-3 py-2">Important: Use language names exactly as shown on your website (including accents, spacing, and brackets).</p>
+                    </div>
+                </div>
+
+                <button id="runBtn" class="w-full rounded-2xl bg-gradient-to-r from-ember-500 to-orange-500 hover:from-ember-400 hover:to-orange-400 text-white font-semibold py-3 px-4 transition duration-300 shadow-ember disabled:opacity-60 disabled:cursor-not-allowed">
+                    Run Agent Loop
+                </button>
+            </section>
+
+            <section class="xl:col-span-8 glass border border-white/10 rounded-3xl p-6 shadow-glow flex flex-col gap-5">
+                <div class="flex items-center justify-between border-b border-white/10 pb-3">
+                    <h2 class="font-display text-xl font-semibold text-amber-100">Real-time Execution</h2>
+                    <span id="progressPercent" class="font-mono text-sm text-amber-200">0%</span>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex items-center justify-between text-sm text-zinc-300">
+                        <span id="statusLabel" class="truncate">Awaiting system trigger...</span>
+                        <span class="text-zinc-500">Progress</span>
+                    </div>
+                    <div class="w-full rounded-full h-4 bg-zinc-900/80 border border-white/10 overflow-hidden">
+                        <div id="progressBar" class="progress-shimmer h-full w-0 bg-gradient-to-r from-amber-400 via-orange-500 to-ember-500 transition-all duration-500"></div>
+                    </div>
+                </div>
+
+                <div id="consoleLog" class="flex-grow min-h-56 bg-black/35 border border-white/10 p-4 rounded-2xl font-mono text-xs text-emerald-300 overflow-y-auto whitespace-pre-wrap shadow-inner">
+                    [System idle] Ready for initialization directives...
+                </div>
+            </section>
+        </div>
+
+        <section class="glass border border-white/10 rounded-3xl p-6 shadow-glow space-y-4">
+            <h2 class="font-display text-xl font-semibold text-amber-100 border-b border-white/10 pb-3">Prompt Assistants</h2>
+            <div class="grid grid-cols-1 gap-4">
+                <div onclick="copyPrompt(this)" class="bg-zinc-900/70 p-4 rounded-2xl border border-white/10 hover:border-amber-300/40 hover:-translate-y-0.5 cursor-pointer transition duration-300">
+                    <span class="text-xs font-bold text-amber-200 block mb-2 uppercase tracking-[0.16em]">Translation Leak Audit</span>
+                    <p class="text-zinc-300 text-sm italic">Review the strings captured inside the generated globalization report JSON files. Based on the validation instructions in skills/TRANSLATE.md, identify any raw English text blocks that missed translation strings or suffered layout text leakage during our crawl</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="reportSection" class="glass border border-white/10 rounded-3xl p-6 hidden space-y-4 shadow-glow">
+            <div class="flex justify-between items-center border-b border-white/10 pb-3 gap-3">
+                <h2 class="font-display text-xl font-semibold text-emerald-300">Compiled Compliance Summary</h2>
+                <span class="text-xs text-zinc-300 bg-black/30 border border-white/10 px-2.5 py-1 rounded-lg" id="reportMetaPath"></span>
+            </div>
+            <pre id="reportContent" class="bg-black/35 border border-white/10 p-4 rounded-2xl text-xs text-zinc-200 overflow-x-auto whitespace-pre-wrap max-h-96 font-mono"></pre>
+        </section>
+
+    </div>
+
+    <script>
+        const socket = io();
+        const runBtn = document.getElementById('runBtn');
+        const consoleLog = document.getElementById('consoleLog');
+        const progressBar = document.getElementById('progressBar');
+        const progressPercent = document.getElementById('progressPercent');
+        const statusLabel = document.getElementById('statusLabel');
+        const reportSection = document.getElementById('reportSection');
+        const reportContent = document.getElementById('reportContent');
+        const reportMetaPath = document.getElementById('reportMetaPath');
+
+        function buildRunVersionTag() {
+            const now = new Date();
+            const yyyy = now.getFullYear();
+            const mm = String(now.getMonth() + 1).padStart(2, '0');
+            const dd = String(now.getDate()).padStart(2, '0');
+            const hh = String(now.getHours()).padStart(2, '0');
+            const min = String(now.getMinutes()).padStart(2, '0');
+            return `run-${yyyy}${mm}${dd}-${hh}${min}`;
+        }
+
+        runBtn.addEventListener('click', () => {
+            const runVersion = buildRunVersionTag();
+            const payload = {
+                url: document.getElementById('targetUrl').value,
+                languages: document.getElementById('languages').value,
+                version: runVersion
+            };
+
+            document.querySelectorAll('.versionRef').forEach(el => el.innerText = payload.version);
+            consoleLog.innerHTML = "🏁 Connecting to automation core...\n";
+            reportSection.classList.add('hidden');
+            runBtn.disabled = true;
+            runBtn.classList.add('opacity-60');
+
+            socket.emit('start_test', payload);
+        });
+
+        socket.on('progress', (data) => {
+            progressBar.style.width = `${data.percent}%`;
+            progressPercent.innerText = `${data.percent}%`;
+            statusLabel.innerText = data.status;
+            consoleLog.innerHTML += `▶️ [${data.percent}%] ${data.status}\n`;
+            consoleLog.scrollTop = consoleLog.scrollHeight;
+        });
+
+        socket.on('complete', (data) => {
+            runBtn.disabled = false;
+            runBtn.classList.remove('opacity-60');
+            reportMetaPath.innerText = data.path;
+            reportContent.innerText = data.reportContent;
+            reportSection.classList.remove('hidden');
+            reportSection.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        function copyPrompt(element) {
+            const txt = element.querySelector('p').innerText;
+            navigator.clipboard.writeText(txt);
+            alert('📋 Copilot prompt copied directly to clipboard! Ready to paste into Copilot Chat.');
+        }
+    </script>
+</body>
+</html>

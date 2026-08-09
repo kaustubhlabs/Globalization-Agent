@@ -9,65 +9,29 @@ export interface GlobalizationReport {
     sampleTextCaptured: string[];
 }
 
-// Dedicated central output directory definition
-const OUTPUT_DIR = path.join(__dirname, '../globalization-output');
+const appVersion = process.env.APPLICATION_VERSION || 'v1.0.0';
+const BASE_OUTPUT_DIR = path.join(__dirname, '../globalization-output');
+const VERSION_OUTPUT_DIR = path.join(BASE_OUTPUT_DIR, appVersion);
+const outputMode = process.env.VERSION_OUTPUT_MODE || 'WIPE_VERSION';
 
-// Ensure the target folder exists at runtime
-if (!fs.existsSync(OUTPUT_DIR)) {
-    fs.mkdirSync(OUTPUT_DIR, { recursive: true });
-}
-
-const accumulatedSnapshots: { [lang: string]: PageSnapshot } = {};
-
-// Exact-match terms that are never subject to translation (brands, domains, acronyms)
-const brandExclusions: string[] = (process.env.BRAND_EXCLUSIONS || '')
-    .split(',')
-    .map(s => s.trim())
-    .filter(Boolean);
-
-function isExcluded(text: string): boolean {
-    return brandExclusions.some(term => text === term);
-}
-
-export function limitTextSamples(texts: string[], maxItems: number = 80): string[] {
-    const seen = new Set<string>();
-    const limited: string[] = [];
-
-    for (const text of texts) {
-        if (limited.length >= maxItems) {
-            break;
-        }
-
-        if (seen.has(text)) {
-            continue;
-        }
-
-        seen.add(text);
-        limited.push(text);
+export function initializeOutputDirectory(): void {
+    if (outputMode === 'WIPE_VERSION' && fs.existsSync(VERSION_OUTPUT_DIR)) {
+        console.log(`🧹 Wiping out previous output matrix folder for version: ${appVersion}`);
+        fs.rmSync(VERSION_OUTPUT_DIR, { recursive: true, force: true });
     }
-
-    return limited;
+    fs.mkdirSync(VERSION_OUTPUT_DIR, { recursive: true });
 }
 
 export function logLanguageValidation(snapshot: PageSnapshot, currentLang: string): void {
-    accumulatedSnapshots[currentLang] = snapshot;
-
-    const filteredElements = snapshot.visibleTextElements
-        .filter(t => !isExcluded(t))
-        .map(t => t.trim());
-    const maxReportedTexts = Number(process.env.MAX_REPORTED_TEXTS || 80);
-
-    // Save language JSONs directly to the dedicated output folder
-    const reportPath = path.join(OUTPUT_DIR, `globalization_report_${currentLang}.json`);
+    const timestamp = outputMode === 'PRESERVE_VERSION' ? `${Date.now()}_` : '';
+    const reportPath = path.join(VERSION_OUTPUT_DIR, `${timestamp}globalization_report_${currentLang}.json`);
+    
     const report: GlobalizationReport = {
         language: currentLang,
         url: snapshot.url,
-        totalTextBlocksEvaluated: filteredElements.length,
-        sampleTextCaptured: limitTextSamples(filteredElements, Number.isFinite(maxReportedTexts) ? maxReportedTexts : 80)
+        totalTextBlocksEvaluated: snapshot.visibleTextElements.length,
+        sampleTextCaptured: snapshot.visibleTextElements
     };
 
     fs.writeFileSync(reportPath, JSON.stringify(report, null, 2));
-    console.log(`💾 Translation map saved for [${currentLang.toUpperCase()}]: ${reportPath}`);
 }
-
-

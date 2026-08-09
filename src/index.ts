@@ -2,7 +2,7 @@
 import * as dotenv from 'dotenv';
 import { handleAuthentication } from './utils/authHandler';
 import { extractPageSnapshot } from './crawler';
-import { logLanguageValidation } from './agentDriver';
+import { logLanguageValidation, initializeOutputDirectory } from './agentDriver';
 
 dotenv.config();
 
@@ -49,6 +49,9 @@ async function waitForApplicationReady(page: Page, waitStrategy: string): Promis
 }
 
 async function runMultiPageGlobalizationTest() {
+    // CRITICAL FIX: Prep the output folders before execution triggers
+    initializeOutputDirectory();
+
     console.log('🚀 Executing Multi-Page Globalization Loop...');
 
     const headless = parseBoolean(process.env.PLAYWRIGHT_HEADLESS, true);

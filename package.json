@@ -1,19 +1,23 @@
 {
   "name": "globalization-agent",
   "version": "1.0.0",
-  "description": "Intent driven generic localization agent",
-  "main": "dist/index.js",
+  "description": "Intent driven generic localization agent with UI assistant",
+  "main": "dist/server.js",
   "scripts": {
     "setup-agent": "npm install && npx playwright install --with-deps",
-    "run-agent": "ts-node src/index.ts"
+    "run-agent": "ts-node src/index.ts",
+    "start-ui": "ts-node src/server.ts"
   },
   "dependencies": {
     "playwright": "^1.49.0",
     "dotenv": "^16.4.5",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
   },
   "devDependencies": {
-    "@types/node": "^20.11.0"
+    "@types/node": "^20.11.0",
+    "@types/express": "^4.17.21"
   }
 }
