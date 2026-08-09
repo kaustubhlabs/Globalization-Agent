@@ -1,0 +1,1 @@
+Review the strings captured inside the generated globalization report JSON files. Based on the validation instructions in skills/TRANSLATE.md, identify any raw English text blocks that missed translation strings or suffered layout text leakage during our crawl

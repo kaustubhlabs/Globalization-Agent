@@ -1,0 +1,7 @@
+# Ignore environment configuration files
+.env
+.env.*
+# Ignore Playwright storage/auth state
+storageState.json
+# Ignore generated globalization reports
+globalization-output/
